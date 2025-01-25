@@ -3,7 +3,7 @@ import { useDebounce } from "react-use"
 import Search from "./components/Search.jsx"
 import Spinner from "./components/Spinner.jsx";
 import MovieCard from "./components/MovieCard.jsx";
-import { updateSearchCount } from "./appwrite.js";
+import { getTrendingMovies, updateSearchCount } from "./appwrite.js";
 
 const API_BASE_URL = "https://api.themoviedb.org/3"
 
@@ -23,6 +23,9 @@ const App = () => {
   const [movies, setMovies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [trendingMovies, setTrendingMovies] = useState([]);
+
+
 
   useDebounce(() => {
     setSearchTerm(debouncedSearchTerm);
@@ -62,9 +65,22 @@ const App = () => {
     }
   }
 
+  const loadTrendingMovies = async () => {
+    try {
+      const movies = await getTrendingMovies();
+      setTrendingMovies(movies);
+    } catch (error) {
+      console.error(`Error fetching trending movies: ${error}`);
+    }
+  }
+
   useEffect(() => {
     fetchMovies(debouncedSearchTerm);
   }, [debouncedSearchTerm]);
+
+  useEffect(() => {
+    loadTrendingMovies();
+  }, [])
 
 
   return (
